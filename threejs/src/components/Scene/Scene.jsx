@@ -32,7 +32,7 @@ const Scene = () => {
 
         // Loader
         const gltfLoader = new GLTFLoader()
-        gltfLoader.load('./model/alambre.gltf',
+        gltfLoader.load('./model/portfolioObject.gltf',
             (gltf) => {
                 scene.add(gltf.scene)
             },
