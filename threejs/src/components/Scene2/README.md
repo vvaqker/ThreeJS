@@ -1,0 +1,1 @@
+Utilizo dat.gui para añadir controles a los objetos 3d y darles diferentes parámetros, en este caso solo está position, pero hay muchos más.

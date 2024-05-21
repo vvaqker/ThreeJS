@@ -19,7 +19,7 @@ const Scene = () => {
             0.1,
             1000
         );
-        camera.position.z = 4.5;
+        camera.position.z = 5.5;
 
         // Renderer
         const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -30,21 +30,38 @@ const Scene = () => {
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
 
+        // Resize
+        const resize = () => {
+            renderer.setSize(currentMount.clientWidth, currentMount.clientHeight)
+            camera.aspect = currentMount.clientWidth | currentMount.clientHeight
+            camera.updateProjectionMatrix()
+        }
+        window.addEventListener('resize', resize)
+
         // Loader
-        const gltfLoader = new GLTFLoader()
+        const textureLoader = new THREE.TextureLoader();
+        const matcap =  textureLoader.load('./textures/matcap1.png')
+        const material = new THREE.MeshMatcapMaterial(
+            {matcap: matcap}
+        )
+
+        const gltfLoader = new GLTFLoader();
         gltfLoader.load('./model/portfolioObject.gltf',
             (gltf) => {
-                scene.add(gltf.scene)
+                // Recorrer los objetos hijos del modelo cargado
+                gltf.scene.traverse((child) => {
+                    // Si el hijo es una malla, aplicar el material
+                    if (child.isMesh) {
+                        child.material = material;
+                    }
+                });
+                scene.add(gltf.scene);
             },
-            () => {
-                
-            },
-            () => {
-                
-            }      
-        )
+        );
+
+
         // Textures
-        const textureLoader = new THREE.TextureLoader();
+        
         const map = textureLoader.load('/textures/bricks/basecolor.jpg');
         const aoMap = textureLoader.load('/textures/bricks/ao.jpg');
         const roughnessMap = textureLoader.load('/textures/bricks/roughness.jpg');
@@ -67,18 +84,11 @@ const Scene = () => {
         };
         animate();
 
-        // Handle window resize
-        const handleResize = () => {
-            camera.aspect = currentMount.clientWidth / currentMount.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(currentMount.clientWidth, currentMount.clientHeight);
-        };
-        window.addEventListener('resize', handleResize);
+
 
         // Clean up scene
         return () => {
             currentMount.removeChild(renderer.domElement);
-            window.removeEventListener('resize', handleResize);
         };
     }, []);
 
