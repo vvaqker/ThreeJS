@@ -1,18 +1,16 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import {gsap} from 'gsap'
+import { gsap } from 'gsap';
 
 // Global variables
 let currentRef = null;
-let renderer, camera, scene, orbitControls;
+let renderer, camera, scene, orbitControls, cube;
 
-const timeLine = new gsap.timeline(
-  {
-    defaults: {
-      duration: 1,
-    }
+const timeLine = new gsap.timeline({
+  defaults: {
+    duration: 1,
   }
-)
+});
 
 // Initialize and mount the scene
 export const initScene = (mountRef) => {
@@ -49,9 +47,8 @@ export const initScene = (mountRef) => {
   // Cube
   const geometry = new THREE.BoxGeometry();
   const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
-  const cube = new THREE.Mesh(geometry, material);
+  cube = new THREE.Mesh(geometry, material); // Define cube in the global scope
   scene.add(cube);
-
 
   // Animate the scene
   const animate = () => {
@@ -60,7 +57,6 @@ export const initScene = (mountRef) => {
     renderer.render(scene, camera);
   };
   animate();
-
 
   // Store the resize function to remove it later
   currentRef.resize = resize;
@@ -80,8 +76,23 @@ export const cleanUpScene = () => {
 };
 
 export const moveCube = () => {
-  timeLine.from(cube.position, {
-    y: 4
+  timeLine
+  .from(cube.position, {
+    y: 4,
+    x: 2,
+    z: 3,
   })
-}
+  .from (cube.rotation, {
+    y: Math.PI * 2
+  })
+  .to (camera, {
+    zoom: 2,
+    onUpdate: () => {
+      camera.updateProjectionMatrix()
+    }
+  })
+  
+};
 
+// Ensure moveCube is called after initScene
+setTimeout(moveCube, 1000);

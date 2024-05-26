@@ -7,10 +7,10 @@ function App() {
 
   return (
     <>
-      {/* <Scene/> */}
+      <Scene/>
       {/* <Scene2/> */}
       {/* <Scene3/> */}
-      <Scene4/>
+      {/* <Scene4/> */}
     </>
   )
 }

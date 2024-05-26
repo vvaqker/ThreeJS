@@ -40,7 +40,7 @@ const Scene = () => {
 
         // Loader
         const textureLoader = new THREE.TextureLoader();
-        const matcap =  textureLoader.load('./textures/matcap1.png')
+        const matcap =  textureLoader.load('./textures/matcap3.png')
         const material = new THREE.MeshMatcapMaterial(
             {matcap: matcap}
         )
