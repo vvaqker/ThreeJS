@@ -1,3 +1,4 @@
+import Particles from './components/Particles'
 import Scene from './components/Scene/Scene'
 import Scene2 from './components/Scene2/Scene2'
 import Scene3 from './components/Scene3/Scene3'
@@ -7,10 +8,11 @@ function App() {
 
   return (
     <>
-      <Scene/>
+      {/* <Scene/> */}
       {/* <Scene2/> */}
       {/* <Scene3/> */}
       {/* <Scene4/> */}
+      <Particles/>
     </>
   )
 }
