@@ -15,23 +15,23 @@ const Particles = () => {
     mountRef.current.appendChild(renderer.domElement);
 
     // Crear sistema de partículas
-    const spacing = 0.1; // Aumentar el espaciado entre partículas para reducir la cantidad total
-    const columns = Math.ceil(window.innerWidth / (spacing * 100)); // Ajustar el cálculo de columnas para reducir la densidad
-    const rows = Math.ceil(window.innerHeight / (spacing * 100)); // Ajustar el cálculo de filas para reducir la densidad
+    const spacing = 0.15; // Espaciado entre partículas
+    const particleSize = 0.01; // Tamaño de la partícula en unidades del espacio
+    const columns = Math.ceil(window.innerWidth / spacing);
+    const rows = Math.ceil(window.innerHeight / spacing);
     const particleCount = columns * rows;
 
     const particles = new THREE.BufferGeometry();
     const particlePositions = new Float32Array(particleCount * 3);
-    const initialPositions = new Float32Array(particleCount * 3); // Para almacenar las posiciones originales
+    const initialPositions = new Float32Array(particleCount * 3);
 
     let index = 0;
     for (let i = 0; i < columns; i++) {
       for (let j = 0; j < rows; j++) {
         particlePositions[index] = (i - columns / 2) * spacing;
         particlePositions[index + 1] = (j - rows / 2) * spacing;
-        particlePositions[index + 2] = 0; // Z fijo en 0 para una cuadrícula plana
+        particlePositions[index + 2] = 0;
 
-        // Guardar las posiciones originales
         initialPositions[index] = particlePositions[index];
         initialPositions[index + 1] = particlePositions[index + 1];
         initialPositions[index + 2] = particlePositions[index + 2];
@@ -44,7 +44,7 @@ const Particles = () => {
 
     // Material para partículas
     const particleMaterial = new THREE.PointsMaterial({
-      size: 0.02, // Tamaño de 2px para las partículas
+      size: particleSize, // Tamaño de 1px para las partículas
       color: 0xffffff,
       transparent: true,
       opacity: 0.75
@@ -53,7 +53,7 @@ const Particles = () => {
     const particleSystem = new THREE.Points(particles, particleMaterial);
     scene.add(particleSystem);
 
-    camera.position.z = 5;
+    camera.position.z = 10; // Ajustar la posición de la cámara para ver toda la cuadrícula
 
     // Animación y renderizado continuo
     const animate = () => {
@@ -79,29 +79,30 @@ const Particles = () => {
 
       const positions = particles.attributes.position.array;
 
-      // Si hay intersecciones, calcular el efecto de repulsión
       if (intersects.length > 0) {
         const mouseX = intersects[0].point.x;
         const mouseY = intersects[0].point.y;
+        const repulsionRadius = 0.3; // Radio de repulsión de aproximadamente 30px
 
         for (let i = 0; i < particleCount; i++) {
-          const dx = mouseX - positions[i * 3];
-          const dy = mouseY - positions[i * 3 + 1];
+          const dx = positions[i * 3] - mouseX;
+          const dy = positions[i * 3 + 1] - mouseY;
           const distance = Math.sqrt(dx * dx + dy * dy);
-          const repulsionRadius = 0.2; // Radio de repulsión de aproximadamente 20px
-          const force = 0.1 / (distance + 0.1); // Fuerza de repulsión
 
           if (distance < repulsionRadius) {
-            positions[i * 3] += dx * force;
-            positions[i * 3 + 1] += dy * force;
+            // Desplazar partículas fuera del radio de repulsión
+            const force = (repulsionRadius - distance) / repulsionRadius;
+            positions[i * 3] += dx / distance * force * 0.1;
+            positions[i * 3 + 1] += dy / distance * force * 0.1;
           } else {
-            // Usar gsap para animar la vuelta a la posición original
+            // Volver rápidamente a la posición original
             gsap.to(positions, {
-              duration: 0.5,
               [i * 3]: initialPositions[i * 3],
               [i * 3 + 1]: initialPositions[i * 3 + 1],
               [i * 3 + 2]: initialPositions[i * 3 + 2],
+              duration: 0.3,
               overwrite: true,
+              ease: 'power3.out',
             });
           }
         }
@@ -125,4 +126,7 @@ const Particles = () => {
 };
 
 export default Particles;
+
+
+
 
